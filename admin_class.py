@@ -1,6 +1,9 @@
 import re
 import getpass
 import coach_class
+import sport_class
+import sort
+import os
 
 class Admin:
     admin_id = ""
@@ -26,8 +29,10 @@ def admin_menu(admin):
     
     students = read_all_registered_student()
     coaches = coach_class.read_all_coaches()
+    sports = sport_class.read_all_sports()
     
     while choose != 5:
+        os.system("cls")
         print("Welcome " + admin.admin_id + " - " + admin.admin_name)
         print("1. View all coach")
         print("2. View all sport")
@@ -43,25 +48,23 @@ def admin_menu(admin):
             continue
 
         if choose < 1 or choose > 5:
-            print("Invalid option given...")
+            input("Invalid option given...")
             continue
 
         if choose == 1:
             # insert empty validation here
-
             sub = -1
-
             while sub != 7:
-                for coach in coaches:
-                    print(coach.coach_id + " - " + coach.coach_name + " - " + str(coach.coach_pay_rate) + " - " + coach.coach_speciality.replace(",",", "))
+                os.system("cls")
+                coach_class.view_coaches(coaches)
                 
                 print("")
                 print("1. Order by name")
                 print("2. Order by pay rate")
                 print("3. Order by performance")
                 print("4. Add coach")
-                print("5. Search Coach")
-                print("6. Update sport")
+                print("5. Search coach")
+                print("6. Update coach")
                 print("7. Exit")
 
                 try:
@@ -72,21 +75,184 @@ def admin_menu(admin):
                     continue
 
                 if sub == 1:
-                    pass
+                    sort.sort_by_coach_name(coaches)
                 elif sub == 2:
-                    pass
+                    sort.sort_by_coach_pay_rate(coaches)
                 elif sub == 3:
                     pass
                 elif sub == 4:
                     coaches.append(coach_class.register())
                 elif sub == 5:
-                    pass
-                elif sub == 6:
-                    pass
-                    
+                    search_menu = -1
+                    coach_id = ""
+                    while search_menu != 3:
+                        search_result = None
+                        coach_id = ""
+                        os.system("cls")
+                        print("1. Search coach by ID")
+                        print("2. Search coach by Overall Performance")
+                        print("3. Exit")
+                        
+                        try:
+                            search_menu = int(input("Choose [1 - 3] : "))
+                        except:
+                            print("Wrong input")
+                            search_menu = -1
+                            continue
 
+                        if search_menu < 1 or search_menu > 3:
+                            print("Invalid option given...")
+                            continue
+
+                        if search_menu == 1:
+                            # Masukin validasi kosong kalau misalnya belum ada coach yang terdaftar
+
+                            while re.search("CO[0-9][0-9][0-9][0-9][0-9][0-9]",coach_id) == None:
+                                coach_id = input("Insert coach id [ Starts with CO and followed by 6 digit ] : ")
+                            
+                            search_result = coach_class.search_coach_by_id(coaches,coach_id)
+                            
+                        elif search_menu == 2:
+                            pass
+                        elif search_menu == 3:
+                            break
+
+                        if search_result:
+                            os.system("cls")
+                            print("Found coach with Coach ID %s"%(search_result.coach_id))
+                            print("Coach name : %s"%(search_result.coach_name))
+                            print("Coach pay rate : %f"%(search_result.coach_pay_rate))
+                            print("Coach speciality : %s"%(search_result.coach_speciality.replace(",",", ")))
+                        else:
+                            print("Coach not found")
+                        os.system("pause")
+
+                elif sub == 6:
+                    update_menu = -1
+                    while update_menu != 3:
+                        coach_id = ""
+                        coach_pay_rate = 0.0
+                        os.system("cls")
+                        print("1. Update coach's pay rate")
+                        print("2. Fire coach")
+                        print("3. Exit")
+
+                        try:
+                            update_menu = int(input("Choose [1 - 3] : "))
+                        except:
+                            print("Wrong input")
+                            os.system("pause")
+                            update_menu = -1
+                            continue
+
+                        if update_menu < 1 or update_menu > 3:
+                            print("Invalid option given...")
+                            os.system("pause")
+                            continue
+                        
+                        if update_menu == 1 or update_menu == 2:
+                            coach_class.view_coaches(coaches)
+
+                            while re.search("CO[0-9][0-9][0-9][0-9][0-9][0-9]",coach_id) == None:
+                                coach_id = input("Insert coach id [ Starts with CO and followed by 6 digit ] : ")
+
+                            update_coach = coach_class.search_coach_by_id(coaches,coach_id)
+
+                            if update_coach == None:
+                                print("Coach not found")
+                                os.system("pause")
+                                continue
+
+                            if update_menu == 1:
+                                # kita update pay rate
+                                while coach_pay_rate <= 0.0:
+                                    try:
+                                        coach_pay_rate = float(input("Insert coach pay rate [ value must more than 0.0 ] : "))
+                                    except:
+                                        print("Invalid pay rate!")
+                                        coach_pay_rate = 0.0
+                                
+                                for idx in range(len(coaches)):
+                                    if coaches[idx].coach_id == update_coach.coach_id:
+                                        coaches[idx].coach_pay_rate = coach_pay_rate
+                                        break
+                                
+                            elif update_menu == 2:
+                                for idx in range(len(coaches)):
+                                    if coaches[idx].coach_id == update_coach.coach_id:
+                                        coaches.pop(idx)
+                                        break
+                            
+                            coach_file = open("./coach/coaches.txt","w")
+
+                            for coach in coaches:
+                                coach_file.write(coach.file_format())
+
+                            coach_file.close()
+                                
         elif choose == 2:
-            pass
+            sub = -1
+            while sub != 4:
+                sport_id = ""
+                sport_fee = 0.0
+                sport_class.view_all_sports(sports)
+                print("\n1. Add sport")
+                print("2. Search sport")
+                print("3. Update sport")
+                print("4. Exit")
+
+                try:
+                    sub = int(input("Choose [1 - 4] : "))
+                except:
+                    print("Wrong input")
+                    sub = -1
+                    os.system("pause")
+                    continue
+
+                if sub == 1:
+                    sports.append(sport_class.add())
+                elif sub == 2 or sub == 3:
+                    while re.search("SP[0-9][0-9][0-9][0-9][0-9][0-9]",sport_id) == None:
+                        sport_id = input("Insert sport id [ Starts with SP and followed by 6 digit ] : ")
+                    
+                    find_sport = sport_class.search_sport_by_id(sports,sport_id)
+
+                    if find_sport == None:
+                        print("Sport not found")
+                        os.system("pause")
+                        continue
+
+                    if sub == 2:
+                        print("Found sport with id %s"%(find_sport.sport_id))
+                        print("Sport name : %s"%(find_sport.sport_name))
+                        print("Sport fee : %f"%(find_sport.sport_fee))
+                        print("Sport center id : %s"%(find_sport.sport_center_id))
+                        os.system("pause")
+                        continue
+                    else:
+                        while sport_fee <= 0.0:
+                            try:
+                                sport_fee = float(input("Insert sport fee [ value must more than 0.0 ] : "))
+                            except:
+                                print("Invalid fee!")
+                                sport_fee = 0.0
+                        
+                        for idx in range(len(sports)):
+                            if sports[idx].sport_id == find_sport.sport_id:
+                                sports[idx].sport_fee = sport_fee
+                                break
+
+                        sport_file = open("./sport/sports.txt","w")
+
+                        for sport in sports:
+                            sport_file.write(sport.file_format())
+
+                        sport_file.close()
+
+                        
+                        
+
+
         elif choose == 3:
             pass
         elif choose == 4:

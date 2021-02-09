@@ -1,5 +1,6 @@
 import re
 import getpass
+import os
 
 class Student:
     student_id = ""
@@ -21,7 +22,7 @@ class Student:
         return self.student_id + "#" + self.student_name + "#" + self.student_password + "#" + str(self.student_weight) + "#" + str(self.student_height) + "#" + self.student_dob + "\n"
 
 def register():
-    print("Menu register")
+    os.system("cls")
     student_id = ""
     student_name = ""
     student_password = ""
@@ -67,6 +68,7 @@ def register():
 def registered_student_menu(student):
     choose = -1
     while choose != 4:
+        os.system("cls")
         print("Welcome " + student.student_id + " - " + student.student_name)
         print("1. View self record")
         print("2. View coach")
@@ -87,6 +89,7 @@ def registered_student_menu(student):
         if choose == 1:
             sub = -1
             while sub != 2:
+                os.system("cls")
                 print("My self record")
                 print("Name :",student.student_name)
                 print("Weight :",student.student_weight,"kg(s)")
@@ -148,6 +151,7 @@ def registered_student_menu(student):
 
 def login_as_student():
     # Input name and password
+    os.system("cls")
     student_id = ""
     student_password = ""
 

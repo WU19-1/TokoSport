@@ -2,10 +2,12 @@ import re
 import getpass
 import student_class
 import admin_class
+import os
     
 def main():
     choose = -1
     while choose != 5:
+        os.system("cls")
         print("1. Login as Admin")
         print("2. Login as Student")
         print("3. Login as Guest")

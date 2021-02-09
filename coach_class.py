@@ -1,4 +1,5 @@
 import re
+import os
 
 class Coach:
     coach_id = ""
@@ -16,6 +17,7 @@ class Coach:
         return self.coach_id + "#" + self.coach_name + "#" + str(self.coach_pay_rate) + "#" + self.coach_speciality + "\n"
 
 def register():
+    os.system("cls")
     coach_id = ""
     coach_name = ""
     coach_pay_rate = 0.0
@@ -57,3 +59,19 @@ def read_all_coaches():
         temp.append(Coach(coach_data[0],coach_data[1],float(coach_data[2]),coach_data[3]))
     
     return temp
+
+def search_coach_by_id(coaches,coach_id):
+    for coach in coaches:
+        if coach.coach_id == coach_id:
+            return coach
+    return None
+
+def update_coach(coaches,coach_pay_rate):
+    pass
+
+def delete_coach(coaches,coach_id):
+    pass
+
+def view_coaches(coaches):
+    for coach in coaches:
+        print(coach.coach_id + " - " + coach.coach_name + " - " + str(coach.coach_pay_rate) + " - " + coach.coach_speciality.replace(",",", "))
