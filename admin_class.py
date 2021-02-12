@@ -2,6 +2,7 @@ import re
 import getpass
 import coach_class
 import sport_class
+import sport_schedule_class
 import sort
 import os
 
@@ -30,6 +31,7 @@ def admin_menu(admin):
     students = read_all_registered_student()
     coaches = coach_class.read_all_coaches()
     sports = sport_class.read_all_sports()
+    sport_schedules = sport_schedule_class.read_all_sport_schedule()
     
     while choose != 5:
         os.system("cls")
@@ -249,12 +251,32 @@ def admin_menu(admin):
 
                         sport_file.close()
 
-                        
-                        
-
-
         elif choose == 3:
-            pass
+            # register sport schedule
+            sub = -1
+            while sub != 3:
+                sport_schedule_class.view_all_sport_schedule(sport_schedules,sports)
+                print("1. Add sport schedule")
+                print("2. Modify sport schedule")
+                print("3. Exit")
+
+                try:
+                    sub = int(input("Choose [1 - 3] : "))
+                except:
+                    print("Wrong input")
+                    sub = -1
+                    continue
+
+                if sub < 1 or sub > 3:
+                    print("Invalid option...")
+                    os.system("pause")
+                    continue
+
+                if sub == 1:
+                    sport_schedules.append(sport_schedule_class.add(sports))
+                elif sub == 2:
+                    sport_schedule_class.update_sport_schedule(sport_schedules)
+
         elif choose == 4:
             sub = -1
             while sub != 2:

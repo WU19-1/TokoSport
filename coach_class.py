@@ -1,6 +1,9 @@
 import re
 import os
 
+UPDATE_OPTION = 1
+FIRE_OPTION = 2
+
 class Coach:
     coach_id = ""
     coach_name = ""

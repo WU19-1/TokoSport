@@ -1,6 +1,8 @@
 import os
 import re
 
+SPORT_CLASSES = ["Swimming", "Badminton", "Football", "Archery", "Gymnastics", "Volleyball", "Basketball", "Cricket", "Tennis", "Table Tennis"]
+
 class Sport:
     sport_id = ""
     sport_name = ""
@@ -16,6 +18,12 @@ class Sport:
     def file_format(self):
         return self.sport_id + "#" + self.sport_name + "#" + str(self.sport_fee) + "#" + self.sport_center_id + "\n"
 
+def print_sport_classes(sports):
+    count = 1
+    for sport in sports:
+        print("%d. %s - %s"%(count,sport.sport_id,sport.sport_name))
+        count += 1
+
 def add():
     os.system("cls")
     sport_id = ""
@@ -27,8 +35,9 @@ def add():
         sport_id = input("Insert sport id [ Starts with SP and followed by 6 digit ] : ")
     
     # sport name validation need 3 to 50 characters
-    while len(sport_name) < 3 or len(sport_name) > 50:
-        sport_name = input("Insert sport name [ 3 to 50 characters ] : ")
+    while sport_name not in sport_classes:
+        print_sport_classes()
+        sport_name = input("Insert sport name : ")
 
     while sport_fee <= 0.0:
         try:
