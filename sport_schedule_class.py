@@ -131,3 +131,11 @@ def update_sport_schedule(sport_schedules):
         sport_schedule_file.write(sport_schedule.file_format())
 
     sport_schedule_file.close()
+
+def find_all_sport_schedules(sport_schedules,sport_id):
+    temp = []
+    for data in sport_schedules:
+        if data.sport_id == sport_id:
+            temp.append(data)
+    return temp
+    

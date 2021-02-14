@@ -1,6 +1,9 @@
 import re
 import getpass
 import os
+import sport_class
+import sport_center_class
+import sport_schedule_class
 
 class Student:
     student_id = ""
@@ -9,26 +12,54 @@ class Student:
     student_weight = 0
     student_height = 0
     student_dob = ""
+    student_phone = ""
+    student_address = ""
 
-    def __init__(self,student_id,student_name,student_password,student_weight,student_height,student_dob):
+    def __init__(self,student_id,student_name,student_password,student_weight,student_height,student_dob,student_phone,student_address):
         self.student_id = student_id
         self.student_name = student_name
         self.student_password = student_password
         self.student_height = student_height
         self.student_weight = student_weight
         self.student_dob = student_dob
+        self.student_address = student_address
+        self.student_phone = student_phone
     
     def file_format(self):
-        return self.student_id + "#" + self.student_name + "#" + self.student_password + "#" + str(self.student_weight) + "#" + str(self.student_height) + "#" + self.student_dob + "\n"
+        return self.student_id + "#" + self.student_name + "#" + self.student_password + "#" + str(self.student_weight) + "#" + str(self.student_height) + "#" + self.student_dob + "#" + self.student_phone + "#" + self.student_address + "\n"
+
+def get_all_student_sport_schedule(sports,sport_centers,sport_schedules,student_id):
+    details = []
+    
+    registered_student_sport_preference_file = open("./student/registered_student_sport.txt","r")
+    student_sport_schedules = registered_student_sport_preference_file.readlines()
+    registered_student_sport_preference_file.close()
+
+    for student_sport_schedule in student_sport_schedules:
+        data = student_sport_schedule.rstrip().split("#")
+        if student_id == data[0]:
+            schedule = sport_schedule_class.search_schedule_by_id(sport_schedules,data[1])
+            sport = sport_class.search_sport_by_id(sports,schedule.sport_id)
+            sport_center = sport_center_class.search_sport_center_by_id(sport_centers,sport.sport_center_id)
+            details.append(sport.sport_name + " - " + schedule.schedule_day + " - " + schedule.schedule_start_time + " - " + schedule.schedule_end_time + " - " + sport_center.sport_center_name + " - " + sport_center.sport_center_address)
+
+    return details
 
 def register():
     os.system("cls")
+
+    sports = sport_class.read_all_sports()
+    sport_schedules = sport_schedule_class.read_all_sport_schedule()
+    sport_centers = sport_center_class.read_all_sport_centers()
+
     student_id = ""
     student_name = ""
     student_password = ""
     student_weight = 0
     student_height = 0
     student_dob = ""
+    student_phone = ""
+    student_address = ""
     
     # Student ID validation based on APU Student ID
     while re.search("TP[0-9][0-9][0-9][0-9][0-9][0-9]",student_id) == None:
@@ -57,8 +88,37 @@ def register():
     while re.search("[0-9][0-9] - [0-9][0-9] - [0-9][0-9][0-9][0-9]",student_dob) == None:
         student_dob = input("Insert student's date of birth [ with format \"dd - mm - yyyy\" ] : ")
 
+    while (len(student_phone) < 12 or len(student_phone) > 13) or (not student_phone.startswith("+60") and not student_phone.startswith("60")):
+        student_phone = input("Insert student's phone number [ starts with +60 or 60 with 12 or 13 digits] : ")
+    
+    while not student_address.endswith(" Street"):
+        student_address = input("Insert student's address [must end with \" Street\"] : ")
+
+    # Tampilkan sport yang ada
+    sport_choice = -1
+    details, choices = sport_class.get_sports_detail(sports,sport_schedules,sport_centers)
+    print(choices)
+    while sport_choice < 1 or sport_choice > len(choices):
+        for detail in details:
+            print(detail)
+        
+        try:
+            sport_choice = int(input("Choose one of the sport [1 - %d] : "%(len(choices))))
+        except:
+            print("Wrong input")
+            sport_choice = -1
+            continue
+
+        if sport_choice < 1 or sport_choice > len(choices):
+            input("Invalid option given...")
+            continue
+
+    registered_student_sport_preference_file = open("./student/registered_student_sport.txt","a")
+    registered_student_sport_preference_file.write(student_id + "#" + choices[sport_choice - 1] + "\n")
+    registered_student_sport_preference_file.close()
+    
     # Create object based on the information that the user have inputted
-    student = Student(student_id,student_name,student_password,student_weight,student_height,student_dob)
+    student = Student(student_id,student_name,student_password,student_weight,student_height,student_dob,student_phone,student_address)
 
     # Insert all student information into credential.txt
     credentials = open("./student/credential.txt","a")
@@ -66,6 +126,11 @@ def register():
     credentials.close()
 
 def registered_student_menu(student):
+
+    sports = sport_class.read_all_sports()
+    sport_schedules = sport_schedule_class.read_all_sport_schedule()
+    sport_centers = sport_center_class.read_all_sport_centers()
+
     choose = -1
     while choose != 4:
         os.system("cls")
@@ -147,7 +212,41 @@ def registered_student_menu(student):
         elif choose == 2:
             pass
         elif choose == 3:
-            pass
+            sub = -1
+
+            student_schedules = get_all_student_sport_schedule(sports,sport_centers,sport_schedules,student.student_id)
+
+            while sub != 4:
+                print("Your sport schedule list:")
+
+                for idx in range(len(student_schedules)):
+                    print("\t" + str(idx + 1) + ". " + student_schedules[idx])
+
+                print("")
+                print("1. Register new sport schedule")
+                print("2. Update sport schedule")
+                print("3. Delete sport schedule")
+                print("4. Exit")
+
+                try:
+                    sub = int(input("Choose [1 - 4] : "))
+                except:
+                    print("Wrong input")
+                    sub = -1
+                    continue
+
+                if sub < 1 or sub > 4:
+                    print("Invalid option given...")
+                    continue
+                
+                if sub == 1:
+                    pass
+                elif sub == 2:
+                    pass
+                elif sub == 3:
+                    pass
+
+
 
 def login_as_student():
     # Input name and password
@@ -174,7 +273,7 @@ def login_as_student():
         # to student menu
         if temp[0] == student_id and temp[2] == student_password:
             print("Login successful!")
-            student = Student(temp[0],temp[1],temp[2],temp[3],temp[4],temp[5])
+            student = Student(temp[0],temp[1],temp[2],temp[3],temp[4],temp[5],temp[6],temp[7])
             registered_student_menu(student)
             return
     

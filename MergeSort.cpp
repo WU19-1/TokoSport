@@ -3,6 +3,14 @@
 int arr[5] = {4,8,3,2,1};
 int temp[5] = {};
 
+int temp1(int a, char b){
+	
+}
+
+int temp1(char a, int b){
+	
+}
+
 void mergesort(int left, int right){
 	// Pengennya sisa sampe satu element, supaya tidak recursive forever, kita kasi kondisi
 	if(left == right)

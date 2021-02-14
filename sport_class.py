@@ -1,5 +1,7 @@
 import os
 import re
+import sport_schedule_class
+import sport_center_class
 
 SPORT_CLASSES = ["Swimming", "Badminton", "Football", "Archery", "Gymnastics", "Volleyball", "Basketball", "Cricket", "Tennis", "Table Tennis"]
 
@@ -72,6 +74,23 @@ def read_all_sports():
 def view_all_sports(sports):
     for sport in sports:
         print(sport.sport_id + " - " + sport.sport_name + " - " + str(sport.sport_fee) + " - " + sport.sport_center_id)
+
+def get_sports_detail(sports,sport_schedules,sport_centers):
+    choices = []
+    details = []
+    count = 1
+    for i in range(len(sports)):
+        sport_center = sport_center_class.search_sport_center_by_id(sport_centers,sports[i].sport_center_id)
+        
+        sport_schedule = sport_schedule_class.find_all_sport_schedules(sport_schedules,sports[i].sport_id)
+        if sport_schedule != []:
+            for data in sport_schedule:
+                details.append(str(count) + ". " + sports[i].sport_name + " - " + str(sports[i].sport_fee) + " - " + data.schedule_start_time + " - " + data.schedule_end_time + " - " + data.schedule_day + " - " + sport_center.sport_center_name + " - " + sport_center.sport_center_address)
+                choices.append(data.sport_schedule_id)
+                count += 1
+
+    return details,choices
+
 
 def search_sport_by_id(sports,sport_id):
     for sport in sports:

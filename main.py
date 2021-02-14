@@ -2,6 +2,9 @@ import re
 import getpass
 import student_class
 import admin_class
+import coach_class
+import sport_class
+import sport_schedule_class
 import os
     
 def main():
@@ -30,7 +33,36 @@ def main():
         elif choose == 2:
             student_class.login_as_student()
         elif choose == 3:
-            pass
+            
+            sports = sport_class.read_all_sports()
+            sport_schedules = sport_schedule_class.read_all_sport_schedule()
+            coaches = coach_class.read_all_coaches()
+
+            sub = -1
+            while sub != 3:
+                os.system("cls")
+                print("1. View all sport")
+                print("2. View all sport schedule")
+                print("3. Exit")
+
+                try:
+                    sub = int(input("Choose [1 - 3] : "))
+                except:
+                    print("Wrong input")
+                    sub = -1
+                    continue
+
+                if sub < 1 or sub > 3:
+                    print("Invalid option given...")
+                    continue
+
+                if sub == 1:
+                    sport_class.view_all_sports(sports)
+                elif sub == 2:
+                    sport_schedule_class.view_all_sport_schedule(sport_schedules,sports)
+
+                os.system("pause")
+
         elif choose == 4:
             student_class.register()
     
