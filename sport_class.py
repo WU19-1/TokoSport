@@ -85,7 +85,7 @@ def get_sports_detail(sports,sport_schedules,sport_centers):
         sport_schedule = sport_schedule_class.find_all_sport_schedules(sport_schedules,sports[i].sport_id)
         if sport_schedule != []:
             for data in sport_schedule:
-                details.append(str(count) + ". " + sports[i].sport_name + " - " + str(sports[i].sport_fee) + " - " + data.schedule_start_time + " - " + data.schedule_end_time + " - " + data.schedule_day + " - " + sport_center.sport_center_name + " - " + sport_center.sport_center_address)
+                details.append(str(count) + ". " + sports[i].sport_name + " - " + str(sports[i].sport_fee) + " - " + data.schedule_day + " - " + data.schedule_start_time + " - " + data.schedule_end_time + " - " + sport_center.sport_center_name + " - " + sport_center.sport_center_address)
                 choices.append(data.sport_schedule_id)
                 count += 1
 

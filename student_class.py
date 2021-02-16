@@ -30,6 +30,7 @@ class Student:
 
 def get_all_student_sport_schedule(sports,sport_centers,sport_schedules,student_id):
     details = []
+    choices = []
     
     registered_student_sport_preference_file = open("./student/registered_student_sport.txt","r")
     student_sport_schedules = registered_student_sport_preference_file.readlines()
@@ -42,8 +43,38 @@ def get_all_student_sport_schedule(sports,sport_centers,sport_schedules,student_
             sport = sport_class.search_sport_by_id(sports,schedule.sport_id)
             sport_center = sport_center_class.search_sport_center_by_id(sport_centers,sport.sport_center_id)
             details.append(sport.sport_name + " - " + schedule.schedule_day + " - " + schedule.schedule_start_time + " - " + schedule.schedule_end_time + " - " + sport_center.sport_center_name + " - " + sport_center.sport_center_address)
+            choices.append(schedule.sport_schedule_id)
 
-    return details
+    return details,choices
+
+def register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student_id):
+    sport_choice = -1
+    details, choices = sport_class.get_sports_detail(sports,sport_schedules,sport_centers)
+    
+    while sport_choice < 1 or sport_choice > len(choices):
+        for detail in details:
+            print(detail)
+        
+        try:
+            sport_choice = int(input("Choose one of the sport [1 - %d] : "%(len(choices))))
+        except:
+            print("Wrong input")
+            sport_choice = -1
+            continue
+
+        if sport_choice < 1 or sport_choice > len(choices):
+            input("Invalid option given...")
+            continue
+
+    registered_student_sport_preference_file = open("./student/registered_student_sport.txt","a")
+    # print(student_id + "#" + choices[sport_choice - 1] + "\n")
+    registered_student_sport_preference_file.write(student_id + "#" + choices[sport_choice - 1] + "\n")
+    registered_student_sport_preference_file.close()
+
+    data = details[sport_choice - 1][3:]
+    data = data.split(" - ")
+    return data[0] + " - " + data[2] + " - " + data[3] + " - " + data[4] + " - " + data[5] + " - " + data[6]
+
 
 def register():
     os.system("cls")
@@ -95,27 +126,7 @@ def register():
         student_address = input("Insert student's address [must end with \" Street\"] : ")
 
     # Tampilkan sport yang ada
-    sport_choice = -1
-    details, choices = sport_class.get_sports_detail(sports,sport_schedules,sport_centers)
-    print(choices)
-    while sport_choice < 1 or sport_choice > len(choices):
-        for detail in details:
-            print(detail)
-        
-        try:
-            sport_choice = int(input("Choose one of the sport [1 - %d] : "%(len(choices))))
-        except:
-            print("Wrong input")
-            sport_choice = -1
-            continue
-
-        if sport_choice < 1 or sport_choice > len(choices):
-            input("Invalid option given...")
-            continue
-
-    registered_student_sport_preference_file = open("./student/registered_student_sport.txt","a")
-    registered_student_sport_preference_file.write(student_id + "#" + choices[sport_choice - 1] + "\n")
-    registered_student_sport_preference_file.close()
+    register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student_id)
     
     # Create object based on the information that the user have inputted
     student = Student(student_id,student_name,student_password,student_weight,student_height,student_dob,student_phone,student_address)
@@ -214,7 +225,7 @@ def registered_student_menu(student):
         elif choose == 3:
             sub = -1
 
-            student_schedules = get_all_student_sport_schedule(sports,sport_centers,sport_schedules,student.student_id)
+            student_schedules, schedule_ids = get_all_student_sport_schedule(sports,sport_centers,sport_schedules,student.student_id)
 
             while sub != 4:
                 print("Your sport schedule list:")
@@ -240,12 +251,42 @@ def registered_student_menu(student):
                     continue
                 
                 if sub == 1:
-                    pass
-                elif sub == 2:
-                    pass
-                elif sub == 3:
-                    pass
+                    student_schedules.append(register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student.student_id))
+                elif sub == 2 or sub == 3:
+                    choice = -1
+                    for idx in range(len(student_schedules)):
+                        print("\t" + str(idx + 1) + ". " + student_schedules[idx])
 
+                    try:
+                        choice = int(input("\nChoose sport schedule [ 1 - %d ] : "%(len(student_schedules))))
+                    except:
+                        print("Wrong input")
+                        choice = -1
+                        continue
+
+                    if choice < 1 or choice > len(student_schedules):
+                        print("Invalid option")
+                        continue
+
+                    if sub == 2:
+                        student_schedules.append(register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student.student_id))
+
+                    registered_student_sport_preference_file = open("./student/registered_student_sport.txt","r")
+                    student_sport_schedules = registered_student_sport_preference_file.readlines()
+                    registered_student_sport_preference_file.close()
+
+                    registered_student_sport_preference_file = open("./student/registered_student_sport.txt","w")
+                        
+                    for student_sport_schedule in student_sport_schedules:
+                        data = student_sport_schedule.rstrip().split("#")
+                        if data[0] == student.student_id and data[1] == schedule_ids[choice - 1]:
+                            continue
+                        registered_student_sport_preference_file.write("%s#%s\n"%(data[0],data[1]))
+                        
+                    registered_student_sport_preference_file.close()
+                    
+                    schedule_ids.pop(choice - 1)
+                    student_schedules.pop(choice - 1)
 
 
 def login_as_student():
