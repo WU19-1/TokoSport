@@ -134,6 +134,7 @@ def register():
     # Insert all student information into credential.txt
     credentials = open("./student/credential.txt","a")
     credentials.write(student.file_format())
+    
     credentials.close()
 
 def registered_student_menu(student):

@@ -25,3 +25,10 @@ def search_sport_center_by_id(sport_centers,sport_center_id):
         if sport_center.sport_center_id == sport_center_id:
             return sport_center
     return None
+
+def search_all_sport_centers(sport_centers,sport_center_id):
+    temp = []
+    for sport_center in sport_centers:
+        if sport_center.sport_center_id == sport_center_id:
+            temp.append(sport_center)
+    return temp

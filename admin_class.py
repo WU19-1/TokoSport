@@ -32,6 +32,7 @@ def admin_menu(admin):
     coaches = coach_class.read_all_coaches()
     sports = sport_class.read_all_sports()
     sport_schedules = sport_schedule_class.read_all_sport_schedule()
+    sport_centers = sport_class.sport_center_class.read_all_sport_centers()
     
     while choose != 5:
         os.system("cls")
@@ -83,7 +84,7 @@ def admin_menu(admin):
                 elif sub == 3:
                     pass
                 elif sub == 4:
-                    coaches.append(coach_class.register())
+                    coaches.append(coach_class.register(sports,sport_schedules,sport_centers))
                 elif sub == 5:
                     search_menu = -1
                     coach_id = ""
@@ -120,11 +121,18 @@ def admin_menu(admin):
                             break
 
                         if search_result:
+
                             os.system("cls")
                             print("Found coach with Coach ID %s"%(search_result.coach_id))
                             print("Coach name : %s"%(search_result.coach_name))
                             print("Coach pay rate : %f"%(search_result.coach_pay_rate))
-                            print("Coach speciality : %s"%(search_result.coach_speciality.replace(",",", ")))
+                            print("Coach phone : %s"%(search_result.coach_phone))
+                            print("Coach address : %s"%(search_result.coach_address))
+                            
+                            # print schedule information
+                            
+                            coach_class.view_all_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id)
+
                         else:
                             print("Coach not found")
                         os.system("pause")
@@ -137,7 +145,8 @@ def admin_menu(admin):
                         os.system("cls")
                         print("1. Update coach's pay rate")
                         print("2. Fire coach")
-                        print("3. Exit")
+                        print("3. Add coach class")
+                        print("4. Exit")
 
                         try:
                             update_menu = int(input("Choose [1 - 3] : "))
@@ -147,12 +156,12 @@ def admin_menu(admin):
                             update_menu = -1
                             continue
 
-                        if update_menu < 1 or update_menu > 3:
+                        if update_menu < 1 or update_menu > 4:
                             print("Invalid option given...")
                             os.system("pause")
                             continue
                         
-                        if update_menu == 1 or update_menu == 2:
+                        if update_menu >= 1 and update_menu <= 3:
                             coach_class.view_coaches(coaches)
 
                             while re.search("CO[0-9][0-9][0-9][0-9][0-9][0-9]",coach_id) == None:
@@ -165,32 +174,36 @@ def admin_menu(admin):
                                 os.system("pause")
                                 continue
 
-                            if update_menu == 1:
-                                # kita update pay rate
-                                while coach_pay_rate <= 0.0:
-                                    try:
-                                        coach_pay_rate = float(input("Insert coach pay rate [ value must more than 0.0 ] : "))
-                                    except:
-                                        print("Invalid pay rate!")
-                                        coach_pay_rate = 0.0
+                            if update_menu in [1,2]:
+                                if update_menu == 1:
+                                    # kita update pay rate
+                                    while coach_pay_rate <= 0.0:
+                                        try:
+                                            coach_pay_rate = float(input("Insert coach pay rate [ value must more than 0.0 ] : "))
+                                        except:
+                                            print("Invalid pay rate!")
+                                            coach_pay_rate = 0.0
+                                    
+                                    for idx in range(len(coaches)):
+                                        if coaches[idx].coach_id == update_coach.coach_id:
+                                            coaches[idx].coach_pay_rate = coach_pay_rate
+                                            break
+                                    
+                                elif update_menu == 2:
+                                    for idx in range(len(coaches)):
+                                        if coaches[idx].coach_id == update_coach.coach_id:
+                                            coaches.pop(idx)
+                                            break
                                 
-                                for idx in range(len(coaches)):
-                                    if coaches[idx].coach_id == update_coach.coach_id:
-                                        coaches[idx].coach_pay_rate = coach_pay_rate
-                                        break
+                                coach_file = open("./coach/coaches.txt","w")
+
+                                for coach in coaches:
+                                    coach_file.write(coach.file_format())
+
+                                coach_file.close()
                                 
-                            elif update_menu == 2:
-                                for idx in range(len(coaches)):
-                                    if coaches[idx].coach_id == update_coach.coach_id:
-                                        coaches.pop(idx)
-                                        break
-                            
-                            coach_file = open("./coach/coaches.txt","w")
-
-                            for coach in coaches:
-                                coach_file.write(coach.file_format())
-
-                            coach_file.close()
+                            elif update_menu == 3:
+                                coach_class.register_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id)
                                 
         elif choose == 2:
             sub = -1

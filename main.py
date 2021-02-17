@@ -6,8 +6,10 @@ import coach_class
 import sport_class
 import sport_schedule_class
 import os
+import rating_class
     
 def main():
+    rating_class.add("TP222222","CO123456",1)
     choose = -1
     while choose != 5:
         os.system("cls")
