@@ -9,7 +9,6 @@ import os
 import rating_class
     
 def main():
-    rating_class.add("TP222222","CO123456",1)
     choose = -1
     while choose != 5:
         os.system("cls")
@@ -67,5 +66,7 @@ def main():
 
         elif choose == 4:
             student_class.register()
-    
-main()
+
+
+if __name__ == "__main__":
+    main()

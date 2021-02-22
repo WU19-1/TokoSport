@@ -4,6 +4,8 @@ import os
 import sport_class
 import sport_center_class
 import sport_schedule_class
+import coach_class
+import rating_class
 
 class Student:
     student_id = ""
@@ -137,11 +139,48 @@ def register():
     
     credentials.close()
 
+def get_all_student_coaches(coaches, sports, sport_schedules, sport_schedule_ids):
+    temp = []
+    coach_ids = []
+
+    registered_coach_schedule_file = open("./coach/registered_coach_schedule.txt","r")
+    coach_schedules = registered_coach_schedule_file.readlines()
+    registered_coach_schedule_file.close()
+
+    count = 1
+
+    for sport_schedule_id in sport_schedule_ids:
+        student_schedule = sport_schedule_class.search_schedule_by_id(sport_schedules, sport_schedule_id)
+        for coach_schedule in coach_schedules:
+            coach_schedule_data = coach_schedule.rstrip().split("#")
+            if coach_schedule_data[1] == sport_schedule_id:
+                coach = coach_class.search_coach_by_id(coaches,coach_schedule_data[0])
+                sport = sport_class.search_sport_by_id(sports, coach.coach_sport_id)
+                temp.append("%d. %s - %s - %s - %s - %s - %s"%(count,student_schedule.schedule_day,student_schedule.schedule_start_time,student_schedule.schedule_end_time,coach.coach_name,coach.coach_phone,sport.sport_name))
+                coach_ids.append(coach.coach_id)
+                count += 1
+                break
+    
+    return temp, coach_ids
+
+def get_all_student_ratings(student_id):
+    temp = []
+    ratings = rating_class.read_all_ratings()
+    
+    for rating in ratings:
+        if rating.student_id == student_id:
+            temp.append(rating)
+    
+    return temp
+
 def registered_student_menu(student):
 
     sports = sport_class.read_all_sports()
     sport_schedules = sport_schedule_class.read_all_sport_schedule()
     sport_centers = sport_center_class.read_all_sport_centers()
+    student_schedules, schedule_ids = get_all_student_sport_schedule(sports,sport_centers,sport_schedules,student.student_id)
+    coaches = coach_class.read_all_coaches()
+    student_ratings = get_all_student_ratings(student.student_id)
 
     choose = -1
     while choose != 4:
@@ -222,11 +261,67 @@ def registered_student_menu(student):
 
 
         elif choose == 2:
-            pass
+            sub = -1
+            choose_coach = -1
+            rating = -1
+            rated = False
+
+            student_coaches, coach_ids = get_all_student_coaches(coaches,sports,sport_schedules,schedule_ids)
+
+            while sub != 2:
+                rated = False
+                print("Your coaches :")
+
+                # print all coach here.
+                for coach in student_coaches:
+                    print(coach)
+
+                print("")
+                print("1. Give rating to coach")
+                print("2. Exit")
+
+                try:
+                    sub = int(input("Choose [1 - 2] : "))
+                except:
+                    print("Wrong input")
+                    sub = -1
+                    continue
+
+                if sub < 1 or sub > 2:
+                    print("Invalid option given...")
+                    continue
+
+                if sub == 1:
+                    try:
+                        choose_coach = int(input("Choose coach [ 1 - %d ] : "%(len(coach_ids))))
+                    except:
+                        choose_coach = -1
+                        continue
+
+                    if choose_coach < 1 or choose_coach > len(coach_ids):
+                        print("Invalid coach!")
+                        continue
+
+                    for student_rating in student_ratings:
+                        if student_rating.coach_id == coach_ids[choose_coach - 1]:
+                            print("You have given a rating to this coach before!")
+                            rated = True
+
+                    if rated:
+                        continue
+
+                    while rating < 1 or rating > 5:
+                        try:
+                            rating = int(input("Insert rating [ 1 - 5 ] : "))
+                        except:
+                            rating = -1
+                            continue
+
+                    student_ratings.append(rating_class.add(student.student_id,coach_ids[choose_coach - 1],rating))
+                    print("Successfully give rating to coach!")
+
         elif choose == 3:
             sub = -1
-
-            student_schedules, schedule_ids = get_all_student_sport_schedule(sports,sport_centers,sport_schedules,student.student_id)
 
             while sub != 4:
                 print("Your sport schedule list:")

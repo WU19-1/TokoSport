@@ -4,6 +4,7 @@ import sport_class
 import sport_center_class
 import sport_schedule_class
 import math
+import rating_class
 
 UPDATE_OPTION = 1
 FIRE_OPTION = 2
@@ -15,17 +16,19 @@ class Coach:
     coach_phone = ""
     coach_address = ""
     coach_sport_id = ""
+    coach_rating = 0.0
 
-    def __init__(self,coach_id,coach_name,coach_pay_rate,coach_phone,coach_address,coach_sport_id):
+    def __init__(self,coach_id,coach_name,coach_pay_rate,coach_phone,coach_address,coach_sport_id,coach_rating):
         self.coach_id = coach_id
         self.coach_name = coach_name
         self.coach_pay_rate = coach_pay_rate
         self.coach_phone = coach_phone
         self.coach_address = coach_address
         self.coach_sport_id = coach_sport_id
+        self.coach_rating = coach_rating
 
     def file_format(self):
-        return "%s#%s#%.2f#%s#%s#%s\n"%(self.coach_id,self.coach_name,self.coach_pay_rate,self.coach_phone,self.coach_address,self.coach_sport_id)
+        return "%s#%s#%.2f#%s#%s#%s#%.2f\n"%(self.coach_id,self.coach_name,self.coach_pay_rate,self.coach_phone,self.coach_address,self.coach_sport_id,self.coach_rating)
 
 def register_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id):
     sport_choice = -1
@@ -108,7 +111,7 @@ def register(sports,sport_schedules,sport_centers):
 
     coach_sport_id = register_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id)
 
-    coach = Coach(coach_id,coach_name,coach_pay_rate,coach_phone,coach_address,coach_sport_id)
+    coach = Coach(coach_id,coach_name,coach_pay_rate,coach_phone,coach_address,coach_sport_id,0)
 
     coaches = open("./coach/coaches.txt","a")
     coaches.write(coach.file_format())
@@ -120,11 +123,14 @@ def read_all_coaches():
     coaches = open("./coach/coaches.txt","r")
     list_of_coaches = coaches.readlines()
     coaches.close()
+
+    ratings = rating_class.read_all_ratings()
     
     temp = []
     for coach in list_of_coaches:
         coach_data = coach.rstrip().split("#")
-        temp.append(Coach(coach_data[0],coach_data[1],float(coach_data[2]),coach_data[3],coach_data[4],coach_data[5]))
+        rating = rating_class.get_performance(ratings, coach_data[0])
+        temp.append(Coach(coach_data[0],coach_data[1],float(coach_data[2]),coach_data[3],coach_data[4],coach_data[5],rating))
     
     return temp
 
@@ -134,14 +140,22 @@ def search_coach_by_id(coaches,coach_id):
             return coach
     return None
 
+def search_coaches_by_performance(coaches, performance):
+    temp = []
+    for coach in coaches:
+        if coach.coach_rating == performance:
+            temp.append(coach)
+
+    return temp
+
 def update_coach(coaches,coach_pay_rate):
     pass
 
 def delete_coach(coaches,coach_id):
     pass
 
-def view_coaches(coaches):
+def view_coaches(coaches, ratings):
     count = 1
     for coach in coaches:
-        print(str(count) + ". " + coach.coach_id + " - " + coach.coach_name + " - " + str(coach.coach_pay_rate) + " - " + coach.coach_phone + " - " + coach.coach_address)
+        print(str(count) + ". " + coach.coach_id + " - " + coach.coach_name + " - " + str(coach.coach_pay_rate) + " - " + coach.coach_phone + " - " + coach.coach_address + " - " + str(coach.coach_rating))
         count += 1

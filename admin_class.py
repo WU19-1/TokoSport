@@ -5,6 +5,7 @@ import sport_class
 import sport_schedule_class
 import sort
 import os
+import rating_class
 
 class Admin:
     admin_id = ""
@@ -33,6 +34,7 @@ def admin_menu(admin):
     sports = sport_class.read_all_sports()
     sport_schedules = sport_schedule_class.read_all_sport_schedule()
     sport_centers = sport_class.sport_center_class.read_all_sport_centers()
+    ratings = rating_class.read_all_ratings()
     
     while choose != 5:
         os.system("cls")
@@ -59,7 +61,7 @@ def admin_menu(admin):
             sub = -1
             while sub != 7:
                 os.system("cls")
-                coach_class.view_coaches(coaches)
+                coach_class.view_coaches(coaches,ratings)
                 
                 print("")
                 print("1. Order by name")
@@ -82,7 +84,7 @@ def admin_menu(admin):
                 elif sub == 2:
                     sort.sort_by_coach_pay_rate(coaches)
                 elif sub == 3:
-                    pass
+                    sort.sort_by_coach_rating(coaches)
                 elif sub == 4:
                     coaches.append(coach_class.register(sports,sport_schedules,sport_centers))
                 elif sub == 5:
@@ -91,6 +93,7 @@ def admin_menu(admin):
                     while search_menu != 3:
                         search_result = None
                         coach_id = ""
+                        coach_rating = -1
                         os.system("cls")
                         print("1. Search coach by ID")
                         print("2. Search coach by Overall Performance")
@@ -107,6 +110,8 @@ def admin_menu(admin):
                             print("Invalid option given...")
                             continue
 
+                        search_results = []
+
                         if search_menu == 1:
                             # Masukin validasi kosong kalau misalnya belum ada coach yang terdaftar
 
@@ -114,27 +119,36 @@ def admin_menu(admin):
                                 coach_id = input("Insert coach id [ Starts with CO and followed by 6 digit ] : ")
                             
                             search_result = coach_class.search_coach_by_id(coaches,coach_id)
+
+                            if search_result:
+                                search_results.append(search_result)
                             
                         elif search_menu == 2:
-                            pass
+                            # Cari coach berdasarkan performance
+                            while coach_rating < 0.0 or coach_rating > 5.0:
+                                try:
+                                    coach_rating = float(input("Insert coach rating [ 0.0 - 5.0 ] : "))
+                                except:
+                                    coach_rating = -1
+                                    print("Invalid coach rating")
+
+                            search_results = coach_class.search_coaches_by_performance(coaches,coach_rating)
+
                         elif search_menu == 3:
                             break
 
-                        if search_result:
-
-                            os.system("cls")
-                            print("Found coach with Coach ID %s"%(search_result.coach_id))
-                            print("Coach name : %s"%(search_result.coach_name))
-                            print("Coach pay rate : %f"%(search_result.coach_pay_rate))
-                            print("Coach phone : %s"%(search_result.coach_phone))
-                            print("Coach address : %s"%(search_result.coach_address))
-                            
-                            # print schedule information
-                            
-                            coach_class.view_all_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id)
-
+                        if search_results:
+                            for search_result in search_results:
+                                print("Found coach with Coach ID %s"%(search_result.coach_id))
+                                print("Coach name : %s"%(search_result.coach_name))
+                                print("Coach pay rate : %f"%(search_result.coach_pay_rate))
+                                print("Coach phone : %s"%(search_result.coach_phone))
+                                print("Coach address : %s\n"%(search_result.coach_address))
+                                coach_class.view_all_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id)
+                                print("")
                         else:
-                            print("Coach not found")
+                            print("Coach not found!")
+
                         os.system("pause")
 
                 elif sub == 6:
@@ -337,9 +351,6 @@ def admin_menu(admin):
 
                     input()
                     
-                    
-                    
-                
 
 
 def login_as_admin():
