@@ -3,8 +3,6 @@ import re
 import sport_schedule_class
 import sport_center_class
 
-SPORT_CLASSES = ["Swimming", "Badminton", "Football", "Archery", "Gymnastics", "Volleyball", "Basketball", "Cricket", "Tennis", "Table Tennis"]
-
 class Sport:
     sport_id = ""
     sport_name = ""
@@ -23,23 +21,35 @@ class Sport:
 def print_sport_classes(sports):
     count = 1
     for sport in sports:
-        print("%d. %s - %s"%(count,sport.sport_id,sport.sport_name))
+        print("%d. %s"%(count,sport.rstrip()))
         count += 1
 
-def add():
+def add(sport_centers):
     os.system("cls")
     sport_id = ""
     sport_name = ""
     sport_fee = 0.0
     sport_center_id = ""
 
-    while re.search("SP[0-9][0-9][0-9][0-9][0-9][0-9]",sport_id) == None:
-        sport_id = input("Insert sport id [ Starts with SP and followed by 6 digit ] : ")
+    # while re.search("SP[0-9][0-9][0-9][0-9][0-9][0-9]",sport_id) == None:
+    #     sport_id = input("Insert sport id [ Starts with SP and followed by 6 digit ] : ")
     
+    list_of_sports_file = open("./sport/list_of_sports.txt")
+    list_of_sports = list_of_sports_file.readlines()
+    list_of_sports_file.close()
+
+    sport_choice = -1
+
     # sport name validation need 3 to 50 characters
-    while sport_name not in sport_classes:
-        print_sport_classes()
-        sport_name = input("Insert sport name : ")
+    while sport_choice < 1 or sport_choice > len(list_of_sports):
+        print_sport_classes(list_of_sports)
+        try:
+            sport_choice = int(input("Choose a sport [ 1 - %d ] : "%(len(list_of_sports))))
+        except:
+            sport_choice = -1
+            print("Invalid input")
+    
+    sport_name = list_of_sports[sport_choice - 1].rstrip()
 
     while sport_fee <= 0.0:
         try:
@@ -48,9 +58,26 @@ def add():
             print("Invalid pay rate!")
             sport_fee = 0.0
     
-    while re.search("SC[0-9][0-9][0-9][0-9][0-9][0-9]",sport_center_id) == None:
-        sport_center_id = input("Insert sport center id [ Starts with SP and followed by 6 digit ] : ")
+    sport_center_choice = -1
+
+    while sport_center_choice < 1 or sport_center_choice > len(sport_centers):
+        count = 1
+        for sport_center in sport_centers:
+            print("%d. %s - %s"%(count,sport_center.sport_center_name,sport_center.sport_center_address))
+            count += 1
+        
+        try:
+            sport_center_choice = int(input("Choose a sport center [ 1 - %d ] "%(len(sport_centers))))
+        except:
+            sport_center_choice = -1
+            print("Invalid option")
+            os.system("pause")
     
+    sport_center_id = sport_centers[sport_center_choice - 1].sport_center_id
+    
+    sport_file = open("./sport/sports.txt","r")
+    sport_id = "SP%.6d"%(len(sport_file.readlines()) + 1)
+    sport_file.close()
 
     sport = Sport(sport_id,sport_name,sport_fee,sport_center_id)
 
@@ -71,9 +98,12 @@ def read_all_sports():
     
     return temp
 
-def view_all_sports(sports):
+def view_all_sports(sports,sport_centers):
+    count = 1
     for sport in sports:
-        print(sport.sport_id + " - " + sport.sport_name + " - " + str(sport.sport_fee) + " - " + sport.sport_center_id)
+        sport_center = sport_center_class.search_sport_center_by_id(sport_centers, sport.sport_center_id)
+        print("%d. %s - %s - %.2f - %s - %s"%(count, sport.sport_id, sport.sport_name, sport.sport_fee, sport_center.sport_center_name, sport_center.sport_center_address))
+        count += 1
 
 def get_sports_detail(sports,sport_schedules,sport_centers):
     choices = []

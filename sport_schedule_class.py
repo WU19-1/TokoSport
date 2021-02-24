@@ -37,8 +37,8 @@ def add(sports):
     schedule_end_time = ""
     schedule_day = ""
 
-    while re.search("SS[0-9][0-9][0-9][0-9][0-9][0-9]",sport_schedule_id) == None:
-        sport_schedule_id = input("Insert sport schedule id [ Starts with SS and followed by 6 digit ] : ")
+    # while re.search("SS[0-9][0-9][0-9][0-9][0-9][0-9]",sport_schedule_id) == None:
+    #     sport_schedule_id = input("Insert sport schedule id [ Starts with SS and followed by 6 digit ] : ")
 
     while re.search("SP[0-9][0-9][0-9][0-9][0-9][0-9]",sport_id) == None or sport_class.search_sport_by_id(sports,sport_id) == None:
         sport_class.print_sport_classes(sports)
@@ -58,6 +58,10 @@ def add(sports):
 
     while schedule_day not in DAY:
         schedule_day = input("Insert day [ choose between Sunday to Saturday ] : ")
+    
+    sport_schedule_file = open("./sport_schedule/sport_schedule.txt","r")
+    sport_schedule_id = "SS%.6d"%(len(sport_schedule_file.readlines()) + 1)
+    sport_schedule_file.close()
 
     sport_schedule = SportSchedule(sport_schedule_id,sport_id,schedule_start_time,schedule_end_time,schedule_day)
     

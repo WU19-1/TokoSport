@@ -6,6 +6,7 @@ import sport_center_class
 import sport_schedule_class
 import coach_class
 import rating_class
+import student_schedule_class
 
 class Student:
     student_id = ""
@@ -30,53 +31,18 @@ class Student:
     def file_format(self):
         return self.student_id + "#" + self.student_name + "#" + self.student_password + "#" + str(self.student_weight) + "#" + str(self.student_height) + "#" + self.student_dob + "#" + self.student_phone + "#" + self.student_address + "\n"
 
-def get_all_student_sport_schedule(sports,sport_centers,sport_schedules,student_id):
-    details = []
-    choices = []
+def read_all_registered_students():
+    temp = []
+
+    students_file = open("./student/credential.txt","r")
+    list_of_students = students_file.readlines()
+    students_file.close()
+
+    for student in list_of_students:
+        student_data = student.rstrip().split("#")
+        temp.append(Student(student_data[0], student_data[1], student_data[2], int(student_data[3]), int(student_data[4]), student_data[5], student_data[6], student_data[7]))
     
-    registered_student_sport_preference_file = open("./student/registered_student_sport.txt","r")
-    student_sport_schedules = registered_student_sport_preference_file.readlines()
-    registered_student_sport_preference_file.close()
-
-    for student_sport_schedule in student_sport_schedules:
-        data = student_sport_schedule.rstrip().split("#")
-        if student_id == data[0]:
-            schedule = sport_schedule_class.search_schedule_by_id(sport_schedules,data[1])
-            sport = sport_class.search_sport_by_id(sports,schedule.sport_id)
-            sport_center = sport_center_class.search_sport_center_by_id(sport_centers,sport.sport_center_id)
-            details.append(sport.sport_name + " - " + schedule.schedule_day + " - " + schedule.schedule_start_time + " - " + schedule.schedule_end_time + " - " + sport_center.sport_center_name + " - " + sport_center.sport_center_address)
-            choices.append(schedule.sport_schedule_id)
-
-    return details,choices
-
-def register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student_id):
-    sport_choice = -1
-    details, choices = sport_class.get_sports_detail(sports,sport_schedules,sport_centers)
-    
-    while sport_choice < 1 or sport_choice > len(choices):
-        for detail in details:
-            print(detail)
-        
-        try:
-            sport_choice = int(input("Choose one of the sport [1 - %d] : "%(len(choices))))
-        except:
-            print("Wrong input")
-            sport_choice = -1
-            continue
-
-        if sport_choice < 1 or sport_choice > len(choices):
-            input("Invalid option given...")
-            continue
-
-    registered_student_sport_preference_file = open("./student/registered_student_sport.txt","a")
-    # print(student_id + "#" + choices[sport_choice - 1] + "\n")
-    registered_student_sport_preference_file.write(student_id + "#" + choices[sport_choice - 1] + "\n")
-    registered_student_sport_preference_file.close()
-
-    data = details[sport_choice - 1][3:]
-    data = data.split(" - ")
-    return data[0] + " - " + data[2] + " - " + data[3] + " - " + data[4] + " - " + data[5] + " - " + data[6]
-
+    return temp
 
 def register():
     os.system("cls")
@@ -93,10 +59,6 @@ def register():
     student_dob = ""
     student_phone = ""
     student_address = ""
-    
-    # Student ID validation based on APU Student ID
-    while re.search("TP[0-9][0-9][0-9][0-9][0-9][0-9]",student_id) == None:
-        student_id = input("Insert student id [ Starts with TP and followed by 6 digit ] : ")
     
     # Student name validation need 3 to 50 characters
     while len(student_name) < 3 or len(student_name) > 50:
@@ -127,8 +89,13 @@ def register():
     while not student_address.endswith(" Street"):
         student_address = input("Insert student's address [must end with \" Street\"] : ")
 
+    # Generate Student ID
+    student_file = open("./student/credential.txt","r")
+    student_id = "TP%.6d"%(len(student_file.readlines()) + 1)
+    student_file.close()
+
     # Tampilkan sport yang ada
-    register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student_id)
+    student_schedule_class.register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student_id)
     
     # Create object based on the information that the user have inputted
     student = Student(student_id,student_name,student_password,student_weight,student_height,student_dob,student_phone,student_address)
@@ -136,8 +103,12 @@ def register():
     # Insert all student information into credential.txt
     credentials = open("./student/credential.txt","a")
     credentials.write(student.file_format())
-    
     credentials.close()
+
+    # Display student id
+    print("Your student ID is : %s"%(student_id))
+    os.system("pause")
+    
 
 def get_all_student_coaches(coaches, sports, sport_schedules, sport_schedule_ids):
     temp = []
@@ -178,7 +149,7 @@ def registered_student_menu(student):
     sports = sport_class.read_all_sports()
     sport_schedules = sport_schedule_class.read_all_sport_schedule()
     sport_centers = sport_center_class.read_all_sport_centers()
-    student_schedules, schedule_ids = get_all_student_sport_schedule(sports,sport_centers,sport_schedules,student.student_id)
+    student_schedules, schedule_ids = student_schedule_class.get_all_student_sport_schedule(sports,sport_centers,sport_schedules,student.student_id)
     coaches = coach_class.read_all_coaches()
     student_ratings = get_all_student_ratings(student.student_id)
 
@@ -258,7 +229,6 @@ def registered_student_menu(student):
                         credentials.write(data)
 
                     credentials.close()
-
 
         elif choose == 2:
             sub = -1
@@ -347,7 +317,7 @@ def registered_student_menu(student):
                     continue
                 
                 if sub == 1:
-                    student_schedules.append(register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student.student_id))
+                    student_schedules.append(student_schedule_class.register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student.student_id))
                 elif sub == 2 or sub == 3:
                     choice = -1
                     for idx in range(len(student_schedules)):
@@ -365,7 +335,7 @@ def registered_student_menu(student):
                         continue
 
                     if sub == 2:
-                        student_schedules.append(register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student.student_id))
+                        student_schedules.append(student_schedule_class.register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student.student_id))
 
                     registered_student_sport_preference_file = open("./student/registered_student_sport.txt","r")
                     student_sport_schedules = registered_student_sport_preference_file.readlines()
@@ -415,3 +385,10 @@ def login_as_student():
             return
     
     print("Invalid Credential!")
+
+def search_student_by_id(students, student_id):
+    for student in students:
+        if student_id == student.student_id:
+            return student
+    
+    return None

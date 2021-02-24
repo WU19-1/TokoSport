@@ -6,6 +6,8 @@ import sport_schedule_class
 import sort
 import os
 import rating_class
+import coach_schedule_class
+import student_class
 
 class Admin:
     admin_id = ""
@@ -20,16 +22,10 @@ class Admin:
     def file_format(self):
         return self.admin_id + "#" + self.admin_name + "#" + self.admin_password + "\n"
 
-def read_all_registered_student():
-    students = open("./student/credential.txt","r")
-    list_of_students = students.readlines()
-    students.close()
-    return list_of_students
-
 def admin_menu(admin):
     choose = -1
     
-    students = read_all_registered_student()
+    students = student_class.read_all_registered_students()
     coaches = coach_class.read_all_coaches()
     sports = sport_class.read_all_sports()
     sport_schedules = sport_schedule_class.read_all_sport_schedule()
@@ -152,11 +148,14 @@ def admin_menu(admin):
                         os.system("pause")
 
                 elif sub == 6:
+
                     update_menu = -1
+                    
                     while update_menu != 3:
                         coach_id = ""
-                        coach_pay_rate = 0.0
+
                         os.system("cls")
+
                         print("1. Update coach's pay rate")
                         print("2. Fire coach")
                         print("3. Add coach class")
@@ -181,50 +180,25 @@ def admin_menu(admin):
                             while re.search("CO[0-9][0-9][0-9][0-9][0-9][0-9]",coach_id) == None:
                                 coach_id = input("Insert coach id [ Starts with CO and followed by 6 digit ] : ")
 
-                            update_coach = coach_class.search_coach_by_id(coaches,coach_id)
+                            coach = coach_class.search_coach_by_id(coaches,coach_id)
 
-                            if update_coach == None:
+                            if coach == None:
                                 print("Coach not found")
                                 os.system("pause")
                                 continue
 
-                            if update_menu in [1,2]:
-                                if update_menu == 1:
-                                    # kita update pay rate
-                                    while coach_pay_rate <= 0.0:
-                                        try:
-                                            coach_pay_rate = float(input("Insert coach pay rate [ value must more than 0.0 ] : "))
-                                        except:
-                                            print("Invalid pay rate!")
-                                            coach_pay_rate = 0.0
-                                    
-                                    for idx in range(len(coaches)):
-                                        if coaches[idx].coach_id == update_coach.coach_id:
-                                            coaches[idx].coach_pay_rate = coach_pay_rate
-                                            break
-                                    
-                                elif update_menu == 2:
-                                    for idx in range(len(coaches)):
-                                        if coaches[idx].coach_id == update_coach.coach_id:
-                                            coaches.pop(idx)
-                                            break
-                                
-                                coach_file = open("./coach/coaches.txt","w")
-
-                                for coach in coaches:
-                                    coach_file.write(coach.file_format())
-
-                                coach_file.close()
+                            if update_menu in [coach_class.coach_option.UPDATE_OPTION, coach_class.coach_option.FIRE_OPTION]:
+                                coach_class.update_or_fire_coach(coaches, coach, update_menu)
                                 
                             elif update_menu == 3:
-                                coach_class.register_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id)
+                                coach_schedule_class.register_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id)
                                 
         elif choose == 2:
             sub = -1
             while sub != 4:
                 sport_id = ""
                 sport_fee = 0.0
-                sport_class.view_all_sports(sports)
+                sport_class.view_all_sports(sports, sport_centers)
                 print("\n1. Add sport")
                 print("2. Search sport")
                 print("3. Update sport")
@@ -239,7 +213,7 @@ def admin_menu(admin):
                     continue
 
                 if sub == 1:
-                    sports.append(sport_class.add())
+                    sports.append(sport_class.add(sport_centers))
                 elif sub == 2 or sub == 3:
                     while re.search("SP[0-9][0-9][0-9][0-9][0-9][0-9]",sport_id) == None:
                         sport_id = input("Insert sport id [ Starts with SP and followed by 6 digit ] : ")
@@ -308,9 +282,10 @@ def admin_menu(admin):
             sub = -1
             while sub != 2:
                 # Print all student data
+                count = 1
                 for student in students:
-                    temp = student.rstrip().split("#")
-                    print(temp[0] + " - " + temp[1])
+                    print("%d. %s - %s - %d kg - %d cm - DOB : %s - %s - %s"%(count, student.student_id, student.student_name, student.student_weight, student.student_height, student.student_dob, student.student_phone, student.student_address))
+                    count += 1
 
                 print("1. Search student by ID")
                 print("2. Exit")
@@ -333,25 +308,22 @@ def admin_menu(admin):
                     while re.search("TP[0-9][0-9][0-9][0-9][0-9][0-9]",student_id) == None:
                         student_id = input("Insert student id [ Starts with TP and followed by 6 digit ] : ")
                     
-                    found = False
-
-                    for student in students:
-                        temp = student.rstrip().split("#")
-                        if temp[0] == student_id:
-                            # Print all student information except for password
-                            print("Student ID :",temp[0])
-                            print("Name :",temp[1])
-                            print("Weight :",temp[3],"kg(s)")
-                            print("Height :",temp[4],"cm(s)")
-                            print("DOB :",temp[5])
-                            found = True
+                    student = student_class.search_student_by_id(students,student_id)
                     
-                    if not found:
-                        print("Invalid student ID")
+                    if student != None:    
+                        # Print all student information except for password
+                        print("Student ID : %s"%(student.student_id))
+                        print("Student Name : %s"%(student.student_name))
+                        print("Student weight : %d"%(student.student_weight))
+                        print("Student height : %d"%(student.student_height))
+                        print("Student dob : %s"%(student.student_dob))
+                        print("Student phone : %s"%(student.student_phone))
+                        print("Student address : %s"%(student.student_address))
+                    else:
+                        print("Student not found")
 
-                    input()
+                    os.system("pause")
                     
-
 
 def login_as_admin():
     # Input name and password

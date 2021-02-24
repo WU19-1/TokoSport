@@ -40,6 +40,7 @@ def main():
             coaches = coach_class.read_all_coaches()
 
             sub = -1
+            
             while sub != 3:
                 os.system("cls")
                 print("1. View all sport")
@@ -66,7 +67,6 @@ def main():
 
         elif choose == 4:
             student_class.register()
-
 
 if __name__ == "__main__":
     main()
