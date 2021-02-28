@@ -51,6 +51,19 @@ def register_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id)
 
     return sport_id
 
+def read_all_coach_schedule():
+    temp = []
+
+    coach_schedule_file = open("./coach/registered_coach_schedule.txt","r")
+    coach_schedules = coach_schedule_file.readlines()
+    coach_schedule_file.close()
+
+    for coach_schedule in coach_schedules:
+        coach_schedule_data = coach_schedule.rstrip().split("#")
+        temp.append(CoachSchedule(coach_schedule_data[0],coach_schedule_data[1]))
+
+    return temp
+
 def view_all_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id):
     register_coach_schedule_file = open("./coach/registered_coach_schedule.txt","r")
     registered_coach_schedules = register_coach_schedule_file.readlines()
@@ -66,3 +79,34 @@ def view_all_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id)
             print("\t%s - %s - %s - %s - %s - %s"%(sport.sport_name,schedule.schedule_day,schedule.schedule_start_time,schedule.schedule_end_time,sport_center.sport_center_name,sport_center.sport_center_address))
     
     register_coach_schedule_file.close()
+
+def find_coach_subtitute(coaches, coach):
+    
+    coach_schedules = read_all_coach_schedule()
+    sport_schedules = sport_schedule_class.read_all_sport_schedule()
+    sports = sport_class.read_all_sports()
+    substitute = -1
+
+    for idx in range(len(coach_schedules)):
+        if coach_schedules[idx].coach_id == coach.coach_id:
+            substitute = -1
+            schedule = sport_schedule_class.search_schedule_by_id(sport_schedules, coach_schedules[idx].schedule_id)
+            sport = sport_class.search_sport_by_id(sports, schedule.sport_id)
+            while substitute < 1 or substitute > len(coaches):
+                os.system("cls")
+                print("Need a substitute for class at %s - %s at %s for sport : %s"%(schedule.schedule_start_time,schedule.schedule_end_time,schedule.schedule_day,sport.sport_name))
+                coach_class.view_coaches(coaches)
+                print("\n")
+                try:
+                    substitute = int(input("Choose a coach [ 1 - %d ] : "%(len(coaches))))
+                except:
+                    substitute = -1
+                
+                coach_schedules[idx].coach_id = coaches[substitute - 1].coach_id
+    
+    coach_schedule_file = open("./coach/registered_coach_schedule.txt","w")
+    
+    for coach_schedule in coach_schedules:
+        coach_schedule_file.write(coach_schedule.file_format())
+    
+    coach_schedule_file.close()

@@ -1,10 +1,8 @@
 import re
 import sport_class
 import os
+import sport_time
 
-START_TIME = ["07:00","09:00","11:00","13:00","15:00","17:00","19:00"]
-END_TIME = ["09:00","11:00","13:00","15:00","17:00","19:00","21:00"]
-DAY = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
 
 class SportSchedule:
     sport_schedule_id = ""
@@ -25,12 +23,10 @@ class SportSchedule:
 
 
 def print_time():
-    global START_TIME,END_TIME
-    for idx in range(len(START_TIME)):
-        print("%d. %s - %s"%(idx + 1,START_TIME[idx],END_TIME[idx]))
+    for idx in range(len(sport_time.START_TIME)):
+        print("%d. %s - %s"%(idx + 1,sport_time.START_TIME[idx],sport_time.END_TIME[idx]))
 
 def add(sports):
-    global START_TIME,END_TIME,DAY
     sport_schedule_id = ""
     sport_id = ""
     schedule_start_time = ""
@@ -53,10 +49,10 @@ def add(sports):
         except:
             choice = -1
     
-    schedule_start_time = START_TIME[choice - 1]
-    schedule_end_time = END_TIME[choice - 1]
+    schedule_start_time = sport_time.START_TIME[choice - 1]
+    schedule_end_time = sport_time.END_TIME[choice - 1]
 
-    while schedule_day not in DAY:
+    while schedule_day not in sport_time.DAY:
         schedule_day = input("Insert day [ choose between Sunday to Saturday ] : ")
     
     sport_schedule_file = open("./sport_schedule/sport_schedule.txt","r")
@@ -96,7 +92,6 @@ def search_schedule_by_id(sport_schedules,sport_schedule_id):
     return None
 
 def update_sport_schedule(sport_schedules):
-    global START_TIME,END_TIME,DAY
     sport_schedule_id = ""
     schedule_start_time = ""
     schedule_end_time = ""
@@ -116,10 +111,10 @@ def update_sport_schedule(sport_schedules):
         except:
             choice = -1
     
-    schedule_start_time = START_TIME[choice - 1]
-    schedule_end_time = END_TIME[choice - 1]
+    schedule_start_time = sport_time.START_TIME[choice - 1]
+    schedule_end_time = sport_time.END_TIME[choice - 1]
 
-    while schedule_day not in DAY:
+    while schedule_day not in sport_time.DAY:
         schedule_day = input("Insert day [ choose between Sunday to Saturday ] : ")
 
     for idx in range(len(sport_schedules)):

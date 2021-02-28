@@ -16,7 +16,7 @@ class Sport:
         self.sport_center_id = sport_center_id
 
     def file_format(self):
-        return self.sport_id + "#" + self.sport_name + "#" + str(self.sport_fee) + "#" + self.sport_center_id + "\n"
+        return "%s#%s#%.2f#%s\n"%(self.sport_id,self.sport_name,self.sport_fee,self.sport_center_id)
 
 def print_sport_classes(sports):
     count = 1

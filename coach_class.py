@@ -167,6 +167,7 @@ def update_or_fire_coach(coaches, coach_obj, option):
         for idx in range(len(coaches)):
             if coaches[idx].coach_id == coach_obj.coach_id:
                 coaches.pop(idx)
+                coach_schedule_class.find_coach_subtitute(coaches,coach_obj)
                 break
 
     coach_file = open("./coach/coaches.txt","w")
@@ -176,7 +177,7 @@ def update_or_fire_coach(coaches, coach_obj, option):
 
     coach_file.close()
 
-def view_coaches(coaches, ratings):
+def view_coaches(coaches):
     count = 1
     for coach in coaches:
         print(str(count) + ". " + coach.coach_id + " - " + coach.coach_name + " - " + str(coach.coach_pay_rate) + " - " + coach.coach_phone + " - " + coach.coach_address + " - " + str(coach.coach_rating))

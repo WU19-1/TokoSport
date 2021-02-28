@@ -20,8 +20,8 @@ class Admin:
         self.admin_password = admin_password
 
     def file_format(self):
-        return self.admin_id + "#" + self.admin_name + "#" + self.admin_password + "\n"
-
+        return "%s#%s#%s\n"%(self.admin_id,self.admin_name,self.admin_password)
+        
 def admin_menu(admin):
     choose = -1
     
@@ -57,7 +57,7 @@ def admin_menu(admin):
             sub = -1
             while sub != 7:
                 os.system("cls")
-                coach_class.view_coaches(coaches,ratings)
+                coach_class.view_coaches(coaches)
                 
                 print("")
                 print("1. Order by name")
@@ -151,7 +151,7 @@ def admin_menu(admin):
 
                     update_menu = -1
                     
-                    while update_menu != 3:
+                    while update_menu != 4:
                         coach_id = ""
 
                         os.system("cls")
@@ -162,7 +162,7 @@ def admin_menu(admin):
                         print("4. Exit")
 
                         try:
-                            update_menu = int(input("Choose [1 - 3] : "))
+                            update_menu = int(input("Choose [ 1 - 4 ] : "))
                         except:
                             print("Wrong input")
                             os.system("pause")

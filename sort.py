@@ -98,7 +98,7 @@ def sort_by_coach_rating(arr):
         k = 0 # pointer pada arraynya si temp
 
         while i < len(left_arr) and j < len(right_arr):
-            if left_arr[i].coach_rating >= right_arr[j].coach_rating:
+            if left_arr[i].coach_rating <= right_arr[j].coach_rating:
                 arr[k] = left_arr[i]
                 i += 1
             else:

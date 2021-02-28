@@ -130,7 +130,6 @@ def get_all_student_coaches(coaches, sports, sport_schedules, sport_schedule_ids
                 temp.append("%d. %s - %s - %s - %s - %s - %s"%(count,student_schedule.schedule_day,student_schedule.schedule_start_time,student_schedule.schedule_end_time,coach.coach_name,coach.coach_phone,sport.sport_name))
                 coach_ids.append(coach.coach_id)
                 count += 1
-                break
     
     return temp, coach_ids
 
