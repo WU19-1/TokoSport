@@ -36,9 +36,18 @@ def add(sports):
     # while re.search("SS[0-9][0-9][0-9][0-9][0-9][0-9]",sport_schedule_id) == None:
     #     sport_schedule_id = input("Insert sport schedule id [ Starts with SS and followed by 6 digit ] : ")
 
-    while re.search("SP[0-9][0-9][0-9][0-9][0-9][0-9]",sport_id) == None or sport_class.search_sport_by_id(sports,sport_id) == None:
+    sport_choice = -1
+
+    while sport_choice < 1 or sport_choice > len(sports):
         sport_class.print_sport_classes(sports)
-        sport_id = input("Insert sport id [ Starts with TP and followed by 6 digit ] : ")
+        try:
+            sport_choice = int(input("Choose sport [ 1 - %d ] : "%(len(sports))))
+        except:
+            sport_choice = -1
+            print("Invalid option")
+            continue
+
+    sport_id = sports[sport_choice - 1].sport_id
 
     choice = -1
 

@@ -21,7 +21,7 @@ class Sport:
 def print_sport_classes(sports):
     count = 1
     for sport in sports:
-        print("%d. %s"%(count,sport.rstrip()))
+        print("%d. %s"%(count,sport.sport_name))
         count += 1
 
 def add(sport_centers):

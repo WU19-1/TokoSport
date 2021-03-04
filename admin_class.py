@@ -140,7 +140,7 @@ def admin_menu(admin):
                                 print("Coach pay rate : %f"%(search_result.coach_pay_rate))
                                 print("Coach phone : %s"%(search_result.coach_phone))
                                 print("Coach address : %s\n"%(search_result.coach_address))
-                                coach_class.view_all_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id)
+                                coach_schedule_class.view_all_coach_sport_schedule(sports,sport_schedules,sport_centers,coach_id)
                                 print("")
                         else:
                             print("Coach not found!")
