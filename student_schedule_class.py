@@ -59,4 +59,5 @@ def register_new_student_sport_schedule(sports,sport_schedules,sport_centers,stu
 
     data = details[sport_choice - 1][3:]
     data = data.split(" - ")
-    return data[0] + " - " + data[2] + " - " + data[3] + " - " + data[4] + " - " + data[5] + " - " + data[6]
+    schedule_data = data[0] + " - " + data[2] + " - " + data[3] + " - " + data[4] + " - " + data[5] + " - " + data[6]
+    return ''.join(schedule_data) , choices[sport_choice - 1]

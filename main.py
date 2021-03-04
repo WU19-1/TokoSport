@@ -7,6 +7,7 @@ import sport_class
 import sport_schedule_class
 import os
 import rating_class
+import sport_center_class
     
 def main():
     choose = -1
@@ -38,6 +39,7 @@ def main():
             sports = sport_class.read_all_sports()
             sport_schedules = sport_schedule_class.read_all_sport_schedule()
             coaches = coach_class.read_all_coaches()
+            sport_centers = sport_center_class.read_all_sport_centers()
 
             sub = -1
             
@@ -59,7 +61,7 @@ def main():
                     continue
 
                 if sub == 1:
-                    sport_class.view_all_sports(sports)
+                    sport_class.view_all_sports(sports,sport_centers)
                 elif sub == 2:
                     sport_schedule_class.view_all_sport_schedule(sport_schedules,sports)
 
