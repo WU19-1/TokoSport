@@ -295,8 +295,6 @@ def registered_student_menu(student):
             while sub != 4:
                 print("Your sport schedule list:")
 
-                print(student_schedules)
-
                 for idx in range(len(student_schedules)):
                     print("\t" + str(idx + 1) + ". " + student_schedules[idx])
 
@@ -318,7 +316,9 @@ def registered_student_menu(student):
                     continue
                 
                 if sub == 1:
-                    student_schedules.append(student_schedule_class.register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student.student_id))
+                    data, sid = student_schedule_class.register_new_student_sport_schedule(sports,sport_schedules,sport_centers,student.student_id)
+                    student_schedules.append(data)
+                    schedule_ids.append(sid)
                     
                 elif sub == 2 or sub == 3:
                     choice = -1
